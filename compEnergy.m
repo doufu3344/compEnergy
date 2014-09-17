@@ -65,17 +65,6 @@ for ai = 1:20
                 topim(:)=topview(:);
                 %%% do morphology to remove 'strip'
                 [topimo,sideimo] = z_morph4dis(topim,sideim);
-
-                subplot(2,2,1);
-                imshow(frontim);
-                title('Front View')
-                subplot(2,2,2);
-                imshow(sideimo);
-                title('Side View');
-                subplot(2,2,3);
-                imshow(topimo);
-                title('Top View');
-                getframe();
                
                 %%% only concern on "flat" case
                 bf=frontim~=0;
@@ -89,22 +78,33 @@ for ai = 1:20
                     mside = accumMap(mside,sideimo,os,ies);
                     mtop = accumMap(mtop,topimo,ot,iet);
 
-                    hist(i) = sum(sum(mfront))+sum(sum(mside))+sum(sum(mtop));
+                   hist(i) = sum(sum(mfront))+sum(sum(mside))+sum(sum(mtop));
+
+%                     hist(i) = sum(sum(mfront));
                 else% layer 0
                     mfront=zeros(size(ief));
                     mside=zeros(size(ies));
                     mtop=zeros(size(iet));
+                    
+                    
+                    prefront = frontim;
+                    
                 end
                 of = frontim;
                 os = sideimo;
                 ot = topimo;
-             end
+                
+                
+                
+            end%for i=1:nnof
             
-            if ~exist('energy','dir')
-                mkdir('energy');
+%             enerfolder = 'energy_only_front';
+            enerfolder = 'energy_three_views';
+            if ~exist(enerfolder,'dir')
+                mkdir(enerfolder);
             end
             [acsr,susr,exsr]=getsr(ai,si,ei);
-            enerpath =['energy\a',acsr,'_s',susr,'_e',exsr,'_ener_my.mat'];
+            enerpath =[enerfolder,'\a',acsr,'_s',susr,'_e',exsr,'_ener.mat'];
             save(enerpath,'hist');
             fclose(fileh);
         end
