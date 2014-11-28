@@ -1,6 +1,6 @@
-function [im,fileh,filehead]=z_headReader(acnr,sunr,exnr,dpath)
-[acsr,susr,exsr]=getsr(acnr,sunr,exnr);
-fileh = fopen([dpath,'\MSRAction3D\a',acsr,'_s',susr,'_e',exsr,'_sdepth.bin']);
+function [im,fileh,filehead]=z_headReader(filepath)
+
+fileh = fopen(filepath);
 if(fileh<0)
     disp('no such file');
     return;

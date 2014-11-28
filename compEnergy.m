@@ -7,7 +7,9 @@
 
 clear;close all;clc;
 
-dpath = '.';
+%binpath = 'E:\datasets\02 MSR Action 3D Dataset';
+binpath = 'C:\Users\doufu\Desktop\MyDailyBin';
+enerfolder = 'C:\Users\doufu\Desktop\energy-daily';
 
 addpath('.\src');
 di=1; % control patch size
@@ -17,9 +19,8 @@ for ai = 1:20
     for si = 1:10
         for ei = 1:3
             actionID=ai;subjectID=si;exampleID=ei;
-            %disp([num2str(actionID),'|',num2str(subjectID),'|',num2str(exampleID)]);
             [acsr,susr,exsr]=getsr(ai,si,ei);
-            filepath = [dpath,'\MSRAction3D\a',acsr,'_s',susr,'_e',exsr,'_sdepth.bin'];
+            filepath = [binpath,'\a',acsr,'_s',susr,'_e',exsr,'_sdepth.bin'];
             if ~exist(filepath,'file');
                 continue;
             end;
@@ -28,14 +29,14 @@ for ai = 1:20
             %%% pre-analyse sequence, find the deepest and shallowest pixels
             %%% for normalization; secondary task: try if this file exist
             try
-                [deep,shallow,bbox]=z_preAnalysis(actionID,subjectID,exampleID,dpath);
+                [deep,shallow,bbox]=z_preAnalysis(filepath);
             catch err
                 disp(err.identifier);
             end
             deep=double(deep);shallow=double(shallow);
             
             %%% re-open the file, read header, not close file.
-            [im,fileh,filehead]= z_headReader(actionID,subjectID,exampleID,dpath);
+            [im,fileh,filehead]= z_headReader(filepath);
             %%% read frame # and width and height (of frontal view) from file-head
             noframe = filehead(1);
             fwidth = filehead(2);
@@ -77,29 +78,19 @@ for ai = 1:20
                     mfront = accumMap(mfront,frontim,of,ief);
                     mside = accumMap(mside,sideimo,os,ies);
                     mtop = accumMap(mtop,topimo,ot,iet);
-
-                   hist(i) = sum(sum(mfront))+sum(sum(mside))+sum(sum(mtop));
-
-%                     hist(i) = sum(sum(mfront));
+%                    hist(i) = sum(sum(mfront))+sum(sum(mside))+sum(sum(mtop));
+                    hist(i) = sum(sum(mfront));
                 else% layer 0
                     mfront=zeros(size(ief));
                     mside=zeros(size(ies));
-                    mtop=zeros(size(iet));
-                    
-                    
-                    prefront = frontim;
-                    
+                    mtop=zeros(size(iet));           
+                    prefront = frontim;   
                 end
                 of = frontim;
                 os = sideimo;
                 ot = topimo;
-                
-                
-                
             end%for i=1:nnof
-            
-%             enerfolder = 'energy_only_front';
-            enerfolder = 'energy_three_views';
+
             if ~exist(enerfolder,'dir')
                 mkdir(enerfolder);
             end
